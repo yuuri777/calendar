@@ -19,12 +19,16 @@ class CalendarController extends Controller
         
         //現在日時を取得
         $now = Carbon::now();
+        // carbonに関して   https://qiita.com/kohboh/items/0e255dc3bba067bc447c
         
         // dd($request);
         //表示する現在の年月を取得
         $year = $request->input('year',$now->year);
     
         $month = $request->input('month',$now->month);
+        $date = $request->input('date');
+        
+            
        
         //カレンダーを表示する日時を取得
         $daysInMonth = Carbon::createFromDate($year,$month)->daysInMonth;
@@ -46,8 +50,8 @@ class CalendarController extends Controller
     }
     public function detail(Request $request,$id)
     {
-    
-        $events = Cal::all();
+       
+        $events = Cal::where('dateid',$id)->get();
         //矢印はオブジェクトプロパティやメソッドにアクセスするために使用される演算子。
         //$roles = $user->roles;の場合は$userオブジェクトのrolesプロパティにアクセスするということ。$roles変数に$userオブジェクトのrolesプロパティが代入される。
 
@@ -60,13 +64,9 @@ class CalendarController extends Controller
     
         //カレンダーを表示する日時を取得
         $daysInMonth = Carbon::createFromDate($year,$month)->daysInMonth;
-     
         // Carbonライブラリを使用して、指定された年と月に対して、その月の日数を計算している。
         // $daysInMonth = Carbon::createFromDateのメソッドで指定された年と月のcarbonインスタンスを作成する。
-        
         $startOfMonth = Carbon::createFromDate($year,$month)->startOfMonth();
-        
-      
         $endOfMonth = Carbon::createFromDate($year,$month)->endOfMonth();
         // dd( $startOfMonth,$endOfMonth);
         //カレンダーの表示に必要なデータを配列に格納
@@ -79,6 +79,7 @@ class CalendarController extends Controller
             "id" => $id , 
             "events" =>$events,
             ];
+            // dd($data);
         
             //カレンダーのビューを表示
         // return view('cal.index',$data);
@@ -126,16 +127,31 @@ class CalendarController extends Controller
         DB::beginTransaction();
         
         try{
+         
+            $date = $request->input('date');
+            $timestamp = strtotime($date);
+            $date_id = date('d', $timestamp);
+            $time_id = date('H', $timestamp);
+            // dd($date_id);
+
             $cal = Cal::create([
                 'user_id' => Auth::id(),
-                'date' =>$request->date,
                 'title' => $request->title,
+                'timeid' =>$time_id,
+                'dateid' => $date_id,
+                'date' =>$request->date,
                 'importance' => $request->importance,
-            ]);
-        
+                
+            ]);   
             $cal->save();
-            dd("cal");
-
+            
+        
+            
+            // strtotimeの取得やdateメソッドにて数字を取得する際について   https://hara-chan.com/it/programming/php-function-date-strtotime/
+           
+            /*$date = $request->input('date');
+            $pp =date('Y-m-d',strtomtime($date));
+            dd($date);*/
             DB::commit();
 
         }catch(\Exception $e) {

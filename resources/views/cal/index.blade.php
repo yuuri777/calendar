@@ -30,7 +30,7 @@
                     <a href="{{ route('cal.detail',['id' => $i]) }}" class="" >{{ $i }}</a>
                 </td>
                 @if ($i == $daysInMonth || $i % 7 == 0)
-                    </tr>
+                </tr>
                 @endif
             @endfor
         </tbody>

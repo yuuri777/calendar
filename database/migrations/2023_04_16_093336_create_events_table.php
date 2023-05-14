@@ -14,10 +14,15 @@ return new class extends Migration
         Schema::create('cals', function (Blueprint $table) {
             $table->id();
             $table->biginteger('user_id')->unsigned();
-            $table->string('tilte');
+            $table->string('title',10);
             $table->dateTime('date');
+            $table->integer('dateid');->default(2);
+            $table->integer('timeid');
             $table->integer('importance'); 
             $table->timestamps();
+
+
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

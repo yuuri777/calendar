@@ -39,7 +39,7 @@
     </table>
 
  </div>
-    <div style="width:50%; margin-top: 30px">
+    <div style="width:80%; margin-top: 30px">
     <div class="container" >
         <div class="row justify-content-center" >
             <div class="col-md-8">

@@ -2,7 +2,7 @@
 @section('content')
 
 
-
+<!-- カレンダー部分 -->
 <div class="d-flex">
   <div style="width:50%;">
     <h1>{{ $year }}年{{ $month }}月 {{ $id }}日</h1>
@@ -32,37 +32,39 @@
                 <a href="{{ route('cal.detail',['id' => $i]) }}" class="" >{{ $i }}</a>
               </td>
               @if ($i == $daysInMonth || $i % 7 == 0)
-                </tr>
+              </tr>
               @endif
             @endfor
           </tbody>
       </table>
     </div>
+    
+    
+    <!-- 右側の時間ごとの詳細部分 -->
     <div class="detail">
       <h1>{{ $id }}</h1> 
-  <!-- <h1>  {  { $date }}</h1> -->
-     
-      
- <div class="border-end bg-white" id="sidebar-wrapper" >
+        <div class="border-end bg-white" id="sidebar-wrapper" >
+          <div class="list-group list-group-flush"  >
+          <!-- 時間詳細の繰り返し文 -->
+          
+          
+          <table >
+          @for ($i = 1; $i <= 24; $i++)
+            <tr >
+              <th style="width: 40px;">{{$i}}</th>
+                @if($events)
+                  @foreach($events as $event)
+                    @if($event->timeid == $i)
+                      <td >{{$event ->title}}  <br>   {{$event->importance}}</td>
+                    @endif
+                  @endforeach
+                @endif
+            </tr>
+          @endfor
+          </table>
+          </div>
+        </div> 
     </div>
-    <div class="list-group list-group-flush" >
-        @for ($i = 1; $i <= 24; $i++)
-
-        <table>
-  <tr>
-  <th >{{$i}}</th>
-  @foreach ($events as $event)
-  <td></td>
-    @endforeach
-    
-  </tr>
-  
-</table>
-
-@endfor
-
-      </div>
-</div>
 
         
 

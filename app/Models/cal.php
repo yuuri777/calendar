@@ -15,9 +15,11 @@ class Cal extends Model
         '低',
     ];
 
-    protected $fiiable =[
+    protected $fillable =[
         'user_id',
         "title",
+        'timeid',
+        'dateid',
         "date",
         "importance",
     ];
@@ -27,5 +29,9 @@ class Cal extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    public function cal()
+    {
+        return $this->hasMany(Cal::class);
     }
 }

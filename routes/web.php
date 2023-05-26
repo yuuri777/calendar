@@ -34,15 +34,24 @@ Route::middleware('auth')->group(function () {
 
     // 予定作成処理
     Route::post('/cal/store',[CalendarController::class,"store"])->name('cal.store');
+
     // 日付ごとの予定確認画面
     Route::get('cal/{id}/detail',[CalendarController::class,"detail"])->name('cal.detail');
 
+    //予定の編集
+    Route::get('cal/{id}/edit',[CalendarController::class,"edit"])->name('cal.edit');
+
+    //予定編集処理
+    Route::post('cal/{id}/update',[CalendarController::class,"update"])->name("cal.update");
+
+    Route::delete('cal/{id}/delete',[CalendarController::class,"delete"])->name("cal.delete");
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
 });
 
 require __DIR__.'/auth.php';

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreCalRequest;
+use App\Http\Requests\UpdateCalRequest;
 use Carbon\Carbon;
 use App\Models\Cal;
 use Illuminate\Support\Facades\DB;
@@ -55,6 +56,7 @@ class CalendarController extends Controller
         //矢印はオブジェクトプロパティやメソッドにアクセスするために使用される演算子。
         //$roles = $user->roles;の場合は$userオブジェクトのrolesプロパティにアクセスするということ。$roles変数に$userオブジェクトのrolesプロパティが代入される。
 
+
         //現在日時を取得
         $now = Carbon::now();
         
@@ -78,6 +80,7 @@ class CalendarController extends Controller
             "endOfMonth" => $endOfMonth, 
             "id" => $id , 
             "events" =>$events,
+            
             ];
             // dd($data);
         
@@ -165,4 +168,138 @@ class CalendarController extends Controller
         return redirect()->route('cal.index');
     }
 
+    /**
+     * 予定編集画面
+     */
+    public function edit($id,Request $request)
+    {
+        // dd($id);
+        $cal = Cal::where('id',$id)->get();
+
+        $now = Carbon::now();
+         
+         //表示する年月を取得
+         $year = $request->input('year',$now->year);
+         $month = $request->input('month',$now->month);
+ 
+         //カレンダーを表示する日時を取得
+         $daysInMonth = Carbon::createFromDate($year,$month)->daysInMonth;
+         // Carbonライブラリを使用して、指定された年と月に対して、その月の日数を計算している。
+         // $daysInMonth = Carbon::createFromDateのメソッドで指定された年と月のcarbonインスタンスを作成する。
+ 
+         $startOfMonth = Carbon::createFromDate($year,$month)->startOfMonth();
+         $endOfMonth = Carbon::createFromDate($year,$month)->endOfMonth();
+
+        $calStatusStrings = Cal::CAL_STATUS_STRING;
+        // dd($cal);
+        $data = [
+            "year" => $year,
+            "month" => $month,
+            "daysInMonth" => $daysInMonth,
+            "startOfMonth" => $startOfMonth,
+            "endOfMonth" => $endOfMonth, 
+            "id" => $id , 
+            'cal'=> $cal,
+            'calStatusStrings' => $calStatusStrings,
+            ];
+
+            return view('cal.edit',$data);
+
+    }
+
+    /**
+     * 予定編集処理
+     */
+    public function update(UpdateCalRequest $request,$id)
+    {
+
+        $cal = Cal::find($id);
+      
+        DB::beginTransaction();
+        try{
+
+        
+        $cal->fill([
+            'title' => $request->input('title'),
+        'date' => $request->input('date'),
+        'importance' => $request->input('importance'),
+        'dateid' => date('d', strtotime($request->input('date'))),
+        'timeid' => date('H', strtotime($request->input('date')))])->save();
+        // 'timeid' はカラム名を指している
+
+        $cal->save();
+      
+//   dd($cal);
+        DB::commit();
+
+
+        // サイド画面表示のコード
+        $now = Carbon::now();
+        //表示する年月を取得
+        $year = $request->input('year',$now->year);
+        $month = $request->input('month',$now->month);
+        //カレンダーを表示する日時を取得
+        $daysInMonth = Carbon::createFromDate($year,$month)->daysInMonth;
+        // Carbonライブラリを使用して、指定された年と月に対して、その月の日数を計算している。
+        // $daysInMonth = Carbon::createFromDateのメソッドで指定された年と月のcarbonインスタンスを作成する。
+        $startOfMonth = Carbon::createFromDate($year,$month)->startOfMonth();
+        $endOfMonth = Carbon::createFromDate($year,$month)->endOfMonth();
+
+       $calStatusStrings = Cal::CAL_STATUS_STRING;
+       $data = [
+           "year" => $year,
+           "month" => $month,
+           "daysInMonth" => $daysInMonth,
+           "startOfMonth" => $startOfMonth,
+           "endOfMonth" => $endOfMonth, 
+           "id" => $id , 
+           'cal'=> $cal,
+           'calStatusStrings' => $calStatusStrings,
+           ];
+        }catch(\Evception $e) {
+
+            DB::rollBack();
+
+            Log::debug($e);
+
+            abort(500);
+        }
+
+      
+
+        return redirect()->route('cal.index',[
+            'id' => $id,
+        ]);
+    }
+    public function delete($id,Request $request)
+{
+    DB::beginTransaction();
+    try{
+        $cal = Cal::find($id);
+        
+        $cal->delete();
+        DB::commit();
+
+        $now = Carbon::now();
+       
+         //表示する年月を取得
+         $year = $request->input('year',$now->year);
+         $month = $request->input('month',$now->month);
+ 
+         //カレンダーを表示する日時を取得
+         $daysInMonth = Carbon::createFromDate($year,$month)->daysInMonth;
+         // Carbonライブラリを使用して、指定された年と月に対して、その月の日数を計算している。
+         // $daysInMonth = Carbon::createFromDateのメソッドで指定された年と月のcarbonインスタンスを作成する。
+ 
+         $startOfMonth = Carbon::createFromDate($year,$month)->startOfMonth();
+         $endOfMonth = Carbon::createFromDate($year,$month)->endOfMonth();
+
+    }catch(\Exception $e) {
+        DB::rolllBack();
+        Log::debug($e);
+        abort(500);
+    }
+    return redirect()->route('cal.index');
+
+}
 }

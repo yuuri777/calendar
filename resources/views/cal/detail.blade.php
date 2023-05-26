@@ -55,7 +55,7 @@
                 @if($events)
                   @foreach($events as $event)
                     @if($event->timeid == $i)
-                      <td >{{$event ->title}}  <br>   {{$event->importance}}</td>
+                      <td ><a href="{{ route('cal.edit',['id' => $event->id] ) }}">{{$event ->title}}</a>  <br>   {{$event->cal_status_string}}</td>
                     @endif
                   @endforeach
                 @endif
@@ -63,9 +63,7 @@
           @endfor
           </table>
           </div>
-        </div> 
-    </div>
+    </div> 
+</div>
 
-        
-
- @endsection 
+@endsection 

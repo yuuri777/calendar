@@ -34,4 +34,16 @@ class Cal extends Model
     {
         return $this->hasMany(Cal::class);
     }
+
+    public function getCalStatusStringAttribute()
+    {
+        $calStatus = $this->attributes['importance'];
+
+        if (!isset(self::CAL_STATUS_STRING[$calStatus])) {
+            return '';
+        }
+
+        return self::CAL_STATUS_STRING[$calStatus];
+    }
+
 }
